@@ -1,0 +1,11 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+Manifest.toml
+/docs/build/
+/docs/site/
+/docs/superpowers/
+.DS_Store
+.vscode/
+.idea/
+benchmark/lc.csv
