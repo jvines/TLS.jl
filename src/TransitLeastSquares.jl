@@ -1,4 +1,4 @@
-module TLS
+module TransitLeastSquares
 
 using LinearAlgebra
 using Statistics
@@ -38,4 +38,4 @@ function tls(time::AbstractVector{<:Real},
                 opts)
 end
 
-end # module TLS
+end # module TransitLeastSquares

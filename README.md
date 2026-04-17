@@ -1,4 +1,4 @@
-# TLS.jl
+# TransitLeastSquares.jl
 
 A Julia implementation of the [Transit Least Squares](https://arxiv.org/abs/1901.02015)
 algorithm (Hippke & Heller 2019) for detecting periodic transits in
@@ -12,13 +12,13 @@ throughput.
 
 ```julia
 using Pkg
-Pkg.add("TLS")      # once registered in the Julia General registry
+Pkg.add("TransitLeastSquares")   # once registered in the Julia General registry
 ```
 
 ## Quick start
 
 ```julia
-using TLS
+using TransitLeastSquares
 
 # time in days, flux normalized to ~1
 result = tls(time, flux; flux_err = flux_err)
@@ -48,7 +48,7 @@ The period search parallelises over the period grid. Launch Julia with
 the number of threads you want to use:
 
 ```bash
-julia -t auto --project -e 'using TLS; ...'
+julia -t auto --project -e 'using TransitLeastSquares; ...'
 ```
 
 ## Benchmarks
@@ -60,7 +60,7 @@ P=3.5 d, T0=1.2 d, duration=0.15 d, depth=0.01, white noise σ=5e-4,
 60-day baseline; grid covers 1.0-8.0 d at oversampling=2, yielding
 ~2380 trial periods; run on a 28-core Linux box):
 
-| Metric            | Python TLS (1T) | Python TLS (4T) | TLS.jl (1T) | TLS.jl (4T) |
+| Metric            | Python TLS (1T) | Python TLS (4T) | TransitLeastSquares.jl (1T) | TransitLeastSquares.jl (4T) |
 |-------------------|----------------:|----------------:|------------:|------------:|
 | Wall time         |       10.46 s   |        4.75 s   |    5.05 s   |  **1.41 s** |
 | Period (true 3.5) |       3.500254  |       3.500254  |   3.498740  |   3.498740  |
@@ -71,11 +71,12 @@ P=3.5 d, T0=1.2 d, duration=0.15 d, depth=0.01, white noise σ=5e-4,
 | Transit count     |             17  |             17  |         17  |         17  |
 | Period grid size  |           2380  |           2380  |       2377  |       2377  |
 
-At matched thread count TLS.jl is ~3× faster; against Python's default
-single-thread config it is ~7× faster. All recovered transit
-parameters agree with Python TLS to within the grid resolution. The
-residual SDE gap (33.9 vs 39.5) comes from the underlying χ² values —
-TLS.jl currently uses an analytic small-planet Mandel-Agol template
+At matched thread count TransitLeastSquares.jl is ~3× faster; against
+Python's default single-thread config it is ~7× faster. All recovered
+transit parameters agree with Python TLS to within the grid resolution.
+The residual SDE gap (33.9 vs 39.5) comes from the underlying χ²
+values — TransitLeastSquares.jl currently uses an analytic small-planet
+Mandel-Agol template
 rather than the full `batman` model Python TLS uses; the
 SR/power/SDE **statistic itself is normalized identically** (see
 `src/statistics.jl`).
@@ -90,7 +91,7 @@ julia --project -t 4 benchmark/run_julia.jl
 
 ## Citation
 
-If you use TLS.jl in published work, please cite Hippke & Heller (2019):
+If you use TransitLeastSquares.jl in published work, please cite Hippke & Heller (2019):
 
 ```bibtex
 @article{Hippke2019,

@@ -1,4 +1,5 @@
-using TLS
+using TransitLeastSquares
+const TLS = TransitLeastSquares
 using DelimitedFiles
 using Printf
 

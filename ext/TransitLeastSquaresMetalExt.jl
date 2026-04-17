@@ -1,6 +1,6 @@
-module TLSMetalExt
+module TransitLeastSquaresMetalExt
 
-using TLS
+using TransitLeastSquares
 using Metal
 
 # Placeholder: Metal-backed hot loop lives here. Wiring into the public
@@ -9,7 +9,7 @@ using Metal
 # extension hook exists in the compat matrix from v0.1 onward.
 
 function __init__()
-    @debug "TLSMetalExt loaded (stub; CPU backend still used)"
+    @debug "TransitLeastSquaresMetalExt loaded (stub; CPU backend still used)"
 end
 
-end # module TLSMetalExt
+end # module TransitLeastSquaresMetalExt
