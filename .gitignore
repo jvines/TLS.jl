@@ -8,4 +8,5 @@ Manifest.toml
 .DS_Store
 .vscode/
 .idea/
+.claude/
 benchmark/lc.csv
