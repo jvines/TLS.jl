@@ -39,9 +39,12 @@ function duration_grid(periods::AbstractVector{<:Real},
     # longest physical transit at shortest period, expressed as fraction
     T_upper = T14(; R_s = R_s, M_s = M_s, P = p_min, upper_limit = true) / p_min
     T_upper = clamp(T_upper, 1e-4, 0.5)
-    # shortest resolvable duration: floor at ~2 cadence points equivalent.
-    # Without knowing cadence here we pick a conservative 1e-4 * p_max / p_min
-    T_lower = 1e-4
+    # Shortest fractional duration. T14/P at p_max≈30 d for a Sun-like star
+    # is ~0.004; anything below ~1e-3 is unphysical and the resulting
+    # templates only contribute noise (sub-bin durations alias rather than
+    # detect). Raising the floor from 1e-4 to 1e-3 trims Ndur by ~26% with
+    # default step=1.1: log(0.5/1e-4)/log(1.1)≈89 → log(0.5/1e-3)/log(1.1)≈66.
+    T_lower = 1e-3
     T_lower < T_upper || return [T_upper]
 
     n = max(N_min, ceil(Int, log(T_upper / T_lower) / log(step)) + 1)

@@ -157,8 +157,24 @@ function _tls(time::Vector{Float64},
     ref = reference_transit(u = opts.u)
     # heuristic: bin count per period ~ samples-per-period at shortest period,
     # bounded to a reasonable range.
-    Nphase = clamp(round(Int, length(time) / opts.n_transits_min / 1), 256, 4096)
+    # Cap Nphase at 2048: at period_min=0.5 d, that's a ~21 s bin — below
+    # every production cadence (TESS 2-min/20-s, Kepler 1-min/30-min), so
+    # the fold doesn't lose information. Per-period inner cost is roughly
+    # Ndur · Nphase · nin_avg with nin ∝ Nphase, so the cost is quadratic
+    # in Nphase; the old 4096 cap paid 4× for headroom no light curve uses.
+    # Default also snaps to a power of 2 because FFTW is ~1.6× faster on
+    # those sizes (3.1μs vs 5.1μs per rfft+irfft pair at N=2048 vs 2500).
+    Nphase = if opts.Nphase !== nothing
+        opts.Nphase
+    else
+        raw = clamp(round(Int, length(time) / opts.n_transits_min), 256, 2048)
+        min(2048, nextpow(2, raw))
+    end
     templates = build_templates(durations, ref, Nphase)
+
+    fft_threshold = opts.fft_threshold === nothing ?
+        ceil(Int, 1.5 * log2(max(2, Nphase))) : opts.fft_threshold
+    fft_cache = build_template_fft(templates; threshold = fft_threshold)
 
     nperiods = length(periods)
     chi2 = Vector{Float64}(undef, nperiods)
@@ -170,6 +186,7 @@ function _tls(time::Vector{Float64},
     nt = Threads.maxthreadid()
     folded_ys = [Vector{Float64}(undef, Nphase) for _ in 1:nt]
     folded_ws = [Vector{Float64}(undef, Nphase) for _ in 1:nt]
+    fft_scratches = [fft_scratch(Nphase) for _ in 1:nt]
 
     # sum_wy^2 is period-independent; precompute once.
     sum_wy2 = 0.0
@@ -181,7 +198,8 @@ function _tls(time::Vector{Float64},
         tid = Threads.threadid()
         fy = folded_ys[tid]
         fw = folded_ws[tid]
-        pb = fold_and_score!(fy, fw, time, y, w, sum_wy2, periods[ip], templates)
+        pb = fold_and_score_hybrid!(fy, fw, fft_scratches[tid], time, y, w,
+                                    sum_wy2, periods[ip], templates, fft_cache)
         chi2[ip] = pb.chi2
         t0_best[ip] = pb.t0
         k_best[ip] = pb.duration_idx

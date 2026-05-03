@@ -7,6 +7,7 @@ using Statistics
 @testset "TLS.jl" verbose = true begin
     include("test_grid.jl")
     include("test_templates.jl")
+    include("test_fft_search.jl")
     include("test_options.jl")
     include("test_ldgrid.jl")
     include("test_catalog.jl")

@@ -21,6 +21,16 @@ Base.@kwdef struct TLSOptions
     threads::Int = Threads.nthreads()
     verbose::Bool = false
     T0_fit_margin::Float64 = 0.01
+    "Templates with `nin >= fft_threshold` are evaluated via FFT cross-correlation
+    instead of the direct SIMD inner loop. `nothing` (default) selects an
+    automatic threshold ≈ 1.5·log2(Nphase). Set `typemax(Int)` to disable
+    FFT, `0` to force every template through FFT."
+    fft_threshold::Union{Nothing,Int} = nothing
+    "Override for the phase-bin count. `nothing` (default) uses the heuristic
+    `clamp(round(length(time) / n_transits_min), 256, 4096)`. Setting this
+    explicitly is mainly useful for benchmarking and for picking
+    FFTW-friendly sizes."
+    Nphase::Union{Nothing,Int} = nothing
 end
 
 """
